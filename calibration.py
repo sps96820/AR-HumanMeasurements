@@ -84,6 +84,26 @@ h, w = image.shape[:2]
 ret, matrix, distortion, r_vecs, t_vecs = cv2.calibrateCamera(
 	threedpoints, twodpoints, grayColor.shape[::-1], None, None)
 
+#undistort using cv2.undistort
+img = cv2.imread('left12.jpg')
+h, w = img.shape[:2]
+newcameramtx, roi = cv2.getOptimalNewCameraMatrix(matrix, distortion, (w,h), 1, (w,h))
+
+dst = cv2.undistort(img, matrix, distortion, None, newcameramtx)
+
+x, y, w, h= roi
+dst = dst[y:y+h, x:x+w]
+cv2.imwrite('calibrate.png', dst)
+
+#undistort using remapping
+
+mapx, mapy = cv2.initUndistortRectifyMap(matrix, distortion, None, newcameramtx, (w,h), 5)
+dst1 = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+
+x, y, w, h = roi
+dst1 = dst1[y:y+h, x:x+h]
+cv2.imwrite('calibrateresult.png', dst1)
+
 
 # Displaying required output
 print(" Camera matrix:")
