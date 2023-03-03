@@ -12,10 +12,15 @@ class calibration:
         self.MIN_POINTS = 50
         self.RECORD = True   
 
-        self.ret, self.corners=None
+        self.ret = None
+        self.corners=None
         self.corners2= None
-        self.matrix, self.distortion, self.r_vecs, self.t_vecs = None
-        self.newcameramatrix, self.roi = None
+        self.matrix = None
+        self.distortion = None
+        self.r_vecs = None
+        self.t_vecs = None
+        self.newcameramatrix = None
+        self.roi = None
         self.outputImage = None
 
         # stop the iteration when specified
