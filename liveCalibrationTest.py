@@ -33,7 +33,10 @@ objectp3d[0, :, :2] = np.mgrid[0:CHECKERBOARD[0],
 prev_img_shape = None
 
 cap = cv2.VideoCapture(0)
-FPS = cap.get(cv2.CAP_PROP_FPS)
+#FPS = cap.get(cv2.CAP_PROP_FPS)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 
 # Check if the webcam is opened correctly
 if not cap.isOpened():
