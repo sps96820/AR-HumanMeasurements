@@ -42,10 +42,10 @@ if not cap.isOpened():
 if RECORD:
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        writer = cv2.VideoWriter('calibration.mp4',
-                                 cv2.VideoWriter_fourcc(*'DIVX'),
-                                 FPS,
-                                 (width,height))
+        #writer = cv2.VideoWriter('calibration.mp4',
+                              #   cv2.VideoWriter_fourcc(*'DIVX'),
+                          #       FPS,
+                             #    (width,height))
 
 while True:
         ret, img = cap.read()
@@ -74,11 +74,11 @@ while True:
 
             twodpoints.append(corners2)
             # When we have minimum number of data points, stop:
-            if len(twodpoints) > MIN_POINTS:
-                cap.release()
-                if RECORD: writer.release()
-                cv2.destroyAllWindows()
-                break
+            #if len(twodpoints) > MIN_POINTS:
+                #cap.release()
+                #if RECORD: writer.release()
+                #cv2.destroyAllWindows()
+                #break
  
             # Draw and display the corners:
             image = cv2.drawChessboardCorners(image,
@@ -87,15 +87,15 @@ while True:
  
         cv2.imshow('img', image)
         
-        if RECORD:
-            writer.write(image)
+        #if RECORD:
+            #writer.write(image)
         
         # wait for ESC key to exit and terminate feed.
         k = cv2.waitKey(1)
         if k == 27:         
             cap.release()
-            if RECORD: writer.release()
-            cv2.destroyAllWindows()
+            #if RECORD: writer.release()
+            #cv2.destroyAllWindows()
             break
 
 h, w = image.shape[:2] 
