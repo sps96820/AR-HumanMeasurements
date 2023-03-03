@@ -91,8 +91,8 @@ def cal():
 
 	dst = cv2.undistort(img, matrix, distortion, None, newcameramtx)
 
-	x, y, w, h= roi
-	dst = dst[y:y+h, x:x+w]
+	#x, y, w, h= roi
+	#dst = dst[y:y+h, x:x+w]
 	cv2.imwrite('calibrate.png', dst)
 
 	#undistort using remapping
