@@ -2,7 +2,6 @@ from math import sqrt
 from pip import main
 import time
 from PIL import Image, ImageTk
-import threading
 import mediapipe as mp
 mp_drawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
@@ -10,24 +9,21 @@ mp_pose = mp.solutions.pose
 close = 0
 
 # Function for mediapipe code
-def media():
-    time.sleep(5)
+def media(image):
+    measurements = []
     # For static images:
-    IMAGE_FILES = []
     BG_COLOR = (192, 192, 192) # gray
     with mp_pose.Pose(
         static_image_mode=True,
         model_complexity=2,
         enable_segmentation=True,
         min_detection_confidence=0.5) as pose:
-        for idx, file in enumerate(IMAGE_FILES):
-            image = cv2.imread(file)
             image_height, image_width, _ = image.shape
             # Convert the BGR image to RGB before processing.
             results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
             if not results.pose_landmarks:
-                continue
+                return 0
             print(f'Nose coordinates: ('
                 f'{results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * image_width}, '
                 f'{results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].y * image_height})')
@@ -54,9 +50,13 @@ def media():
             lhip = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
             rankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
 
-            height = abs(reyebrow.y - rheel.y)
-            shoulder = abs(lshoulder.x - rshoulder.x)
-            armsx = abs(rshoulder.x - rwrist.x)
-            armsy = abs(rshoulder.y - rwrist.y)
+            height = abs(reyebrow.y*image_height - rheel.y*image_height)
+            shoulder = abs(lshoulder.x*image_width - rshoulder.x*image_width)
+            armsx = abs(rshoulder.x*image_width - rwrist.x*image_width)
+            armsy = abs(rshoulder.y*image_height - rwrist.y*image_height)
             arms = sqrt(armsx*armsx + armsy*armsy)
+            measurements.append(height, shoulder, arms)
+            return measurements
+
+
             
