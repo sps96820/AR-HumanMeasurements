@@ -81,3 +81,4 @@ class calibration:
         h, w = img.shape[:2]
         self.newcameramatrix, self.roi = cv2.getOptimalNewCameraMatrix(self.matrix, self.distortion, (w,h), 1, (w,h))
         self.outputImage = cv2.undistort(img, self.matrix, self.distortion, None, self.newcameramatrix)
+        return self.outputImage
