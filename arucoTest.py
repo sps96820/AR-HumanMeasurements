@@ -21,6 +21,15 @@ def findArucoMarkers(img, markerSize = 7, totalMarkers=250, draw=True):
     
     # Detect the markers
     bboxs, ids, rejected = cv2.aruco.detectMarkers(gray, arucoDict, parameters = arucoParam)
+    
+    # Draw Corners to verify
+    int_corners = np.int0(bboxs)
+    cv2.polylines(gray, int_corners, True, (0, 255, 0), 2)
+    cv2.imshow("image", gray)
+    cv2.waitKey(0)
+    
+    
+    
     return bboxs, ids, rejected
 # find object size 
 
