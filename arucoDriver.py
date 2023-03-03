@@ -7,14 +7,23 @@ temp = scaleAq()
 calib = calibration()
 
 
-
+images = []
 i = 0
-while i < 300:
+while i < 30:
     _, image = cap.read()
-    temp.scale(image)
-    print(temp.ratio)
+    images.append(image)
+    #temp.scale(image)
+    #print(temp.ratio)
     i+=1
 
+calib.getMatrix(images)
+
+while True:
+    _, image = cap.read()
+    image = calib.undistortImage(image)
+
+    temp.scale(image)
+    print(temp.ratio)
 
 
 cap.release()

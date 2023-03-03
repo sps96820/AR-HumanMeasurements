@@ -45,7 +45,7 @@ class calibration:
 
     def getMatrix(self, images):
         for filename in images:
-            image = cv2.imread(filename)
+            image = filename
             grayColor = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
             # Find the chess board corners
@@ -65,15 +65,17 @@ class calibration:
 
                 # Refining pixel coordinates
                 # for given 2d points.
-                corners2 = cv2.cornerSubPix(
+                self.corners2 = cv2.cornerSubPix(
                     grayColor, self.corners, (11, 11), (-1, -1), self.criteria)
 
-                self.twodpoints.append(corners2)
+                self.twodpoints.append(self.corners2)
 
                 # Draw and display the corners
                 image = cv2.drawChessboardCorners(image,
                                                 self.CHECKERBOARD,
-                                                corners2, self.ret)
+                                                self.corners2, self.ret)
+                #cv2.imshow('temp', image)
+                #cv2.waitKey(1)
         # Perform camera calibration by
         # passing the value of above found out 3D points (threedpoints)
         # and its corresponding pixel coordinates of the
