@@ -6,6 +6,8 @@ from numpy import savetxt
 from numpy import genfromtxt
 
 
+
+
 # Define the dimensions of checkerboard
 CHECKERBOARD = (7 ,4)
 MIN_POINTS = 50
@@ -109,7 +111,7 @@ h, w = image.shape[:2]
 # detected corners (twodpoints):
 ret, matrix, distortion, r_vecs, t_vecs = cv2.calibrateCamera(
     threedpoints, twodpoints, grayColor.shape[::-1], None, None) 
- 
+
 # Displaying required output
 print(" Camera matrix:")
 print(matrix)

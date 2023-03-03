@@ -1,4 +1,4 @@
-from arucoTest2 import scaleAq
+from arucoClass import scaleAq
 
 temp = scaleAq()
 
