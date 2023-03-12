@@ -20,20 +20,23 @@ def update_frame(imagearr):
     if key == 27:
         cv2.destroyAllWindows()
         return
-    if finished:
+    if not im.is_alive:
         cv2.destroyAllWindows()
         return
     update_frame(imagearr)
 
 # Function for main
 def main():
-    global cap, finished
+    global cap
     sys.setrecursionlimit(9999)
-    finished = False
     imagearr = []
     cap = cv2.VideoCapture(0)
-    vid = threading.Thread(target = update_frame, args=(imagearr,))
-    vid.start()
+    global im 
+    im = threading.Thread(target = imaging, args=(imagearr,))
+    im.start()
+    update_frame(imagearr)
+
+def imaging(imagearr):
     time.sleep(2)
     # Undistort images
     calib = cal()
@@ -70,7 +73,6 @@ def main():
     avglist = measureavg(measurelist, ratio)
     # Print final values
     print("Height: ", avglist[0], "\nShoulder: ", avglist[1], "\nArms: ", avglist[2])
-    finished = True
     
 def scale(corrected):
     sca = aru()
