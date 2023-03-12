@@ -102,5 +102,5 @@ class calibration:
         #self.outputImage = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
         x, y, w, h = self.roi
         outputImage = outputImage[y:y+h, x:x+w]
-        print("image undistorted")
+        #print("image undistorted")
         return outputImage

@@ -21,7 +21,7 @@ calib.getMatrix(images)
 while True:
     _, image = cap.read()
     image = calib.undistortImage(image)
-
+    cv2.imshow("image", image)
     temp.scale(image)
     print(temp.ratio)
     key = cv2.waitKey(1)

@@ -14,7 +14,7 @@ class scaleAq:
         #cap.set(cv2.CAP_PROP_FPS, 120)
         #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        #self.ratio = 0
+        self.ratio = 0
         self.arucoPresent = False
 
         # class variables for ratio array and average Ratio
