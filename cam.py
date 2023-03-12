@@ -98,7 +98,16 @@ def measureavg(measurelist, ratio):
     arms = 0
     # Add together all of the measurements in the lists
     counter = 0
+    heightL = 0
+    shoulderL = 0
+    armsL = 0
     for list in measurelist:
+        if counter == 0:
+            heightL = len(list)
+        elif counter == 1:
+            shoulderL = len(list)
+        elif counter == 2:
+            armsL = len(list)
         for num in list:
             if counter == 0:
                 height += num
@@ -114,9 +123,9 @@ def measureavg(measurelist, ratio):
     print(shoulder)
     print(arms)
     # Average the measurements
-    height = height / len(measurelist)
-    shoulder = shoulder / len(measurelist)
-    arms = arms / len(measurelist)
+    height = height / heightL
+    shoulder = shoulder / shoulderL
+    arms = arms / armsL
     # Scale and return
     height = height / ratio
     shoulder = shoulder / ratio
