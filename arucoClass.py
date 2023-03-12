@@ -41,17 +41,4 @@ class scaleAq:
             self.arucoPresent = True
                 
             cv2.polylines(image, int_corners, True, (0, 255, 0), 2)
-        #cv2.imshow("image", image)
-        #key = cv2.waitKey(1)
-        #if key == 27:
-            #self.cap.release()
-            #cv2.destroyAllWindows()
         return self.arucoPresent
-            #break
-        #sum = 0
-        #for temp in self.ratioArray:
-         #   sum+= temp
-        #self.averageRatio = sum / 30
-
-#cap.release()
-#cv2.destroyAllWindows()
