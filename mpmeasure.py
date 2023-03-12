@@ -11,7 +11,7 @@ close = 0
 
 # Function for mediapipe code
 def media(image):
-    measurements = [[],[],[]]
+    measurements = []
     # For static images:
     BG_COLOR = (192, 192, 192) # gray
     with mp_pose.Pose(
@@ -24,6 +24,7 @@ def media(image):
             results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
             if not results.pose_landmarks:
+                print("error exiting")
                 return 0
             print(f'Nose coordinates: ('
                 f'{results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * image_width}, '
@@ -57,9 +58,11 @@ def media(image):
             armsy = abs(rshoulder.y*image_height - rwrist.y*image_height)
             arms = sqrt(armsx*armsx + armsy*armsy)
             #measurements.append(height, shoulder, arms)
-            measurements[0].append(height)
-            measurements[1].append(shoulder)
-            measurements[2].append(arms)
+            measurements.append(height)
+            measurements.append(shoulder)
+            measurements.append(arms)
+            print("measurements")
+            print(measurements)
             return measurements
 
 

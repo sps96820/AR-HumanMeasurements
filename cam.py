@@ -43,17 +43,33 @@ def main():
         corrected.append(calib.undistortImage(img))
     print("before scale")
     ratio = scale(corrected)
+    print("ratio")
     print(ratio)
     # Get scale and measurements
     if ratio == 0:
         # Panic
         return
-    measurelist = []
-    for image in corrected:
-        measurelist.append(mpm.media(image))
+    
+    mediapipeImgs = []
+    
+    print("Put papers down")
+    time.sleep(3)
+    for i in range(30):
+        _, temp = cap.read() 
+        mediapipeImgs.append(calib.undistortImage(temp))
+        #mediapipeImgs[i] = calib.undistortImage(mediapipeImgs[i])
+    
+    measurelist = [[] for i in range(3)]
+    #for image in corrected:
+    for image in mediapipeImgs:
+        temp = mpm.media(image)
+        print(temp)
+        measurelist[0].append(temp[0])
+        measurelist[1].append(temp[1])
+        measurelist[2].append(temp[2])
     avglist = measureavg(measurelist, ratio)
     # Print final values
-    print("Height: " + avglist[0] + "\nShoulder: " + avglist[1] + "\nArms: " + avglist[2])
+    print("Height: ", avglist[0], "\nShoulder: ", avglist[1], "\nArms: ", avglist[2])
     finished = True
     
 def scale(corrected):
@@ -81,12 +97,22 @@ def measureavg(measurelist, ratio):
     shoulder = 0
     arms = 0
     # Add together all of the measurements in the lists
-    for num in measurelist[0]:
-        height+=num
+    counter = 0
+    for list in measurelist:
+        for num in list:
+            if counter == 0:
+                height += num
+            elif counter == 1:
+                shoulder += num
+            elif counter == 2:
+                arms += num
+        counter += 1
         #height = list[0]
         #shoulder = list[1]
         #arms = list[2]
     print(height)
+    print(shoulder)
+    print(arms)
     # Average the measurements
     height = height / len(measurelist)
     shoulder = shoulder / len(measurelist)
