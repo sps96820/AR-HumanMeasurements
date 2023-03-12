@@ -27,6 +27,7 @@ def update_frame(imagearr):
 
 # Function for main
 def main():
+    time.sleep(4)
     global cap
     sys.setrecursionlimit(9999)
     imagearr = []
