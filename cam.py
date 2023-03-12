@@ -34,14 +34,16 @@ def main():
     cap = cv2.VideoCapture(0)
     vid = threading.Thread(target = update_frame, args=(imagearr,))
     vid.start()
-    time.sleep(1)
+    time.sleep(2)
     # Undistort images
     calib = cal()
     calib.getMatrix(imagearr)
     corrected = []
-    #for img in imagearr:
-    #    corrected.append(calib.undistortImage(img))
+    for img in imagearr:
+        corrected.append(calib.undistortImage(img))
+    print("before scale")
     ratio = scale(corrected)
+    print(ratio)
     # Get scale and measurements
     if ratio == 0:
         # Panic
@@ -59,16 +61,19 @@ def scale(corrected):
     ratio = []
     # Get the scales for each image
     for img in corrected:
-        if not sca.scale(img):
+        print("in for")
+        if sca.scale(img):
             ratio.append(sca.ratio)
+    print("after for in scale")
     # Check for issues
     if len(ratio) < 15:
+        print("no aruco images found")
         return 0
     # Calculating the average scale
     temp = 0
     for num in ratio:
         temp = temp + num
-    temp = temp / 30
+    temp = temp / len(ratio)
     return temp
 
 def measureavg(measurelist, ratio):
@@ -76,10 +81,12 @@ def measureavg(measurelist, ratio):
     shoulder = 0
     arms = 0
     # Add together all of the measurements in the lists
-    for list in measurelist:
-        height = list[0]
-        shoulder = list[1]
-        arms = list[2]
+    for num in measurelist[0]:
+        height+=num
+        #height = list[0]
+        #shoulder = list[1]
+        #arms = list[2]
+    print(height)
     # Average the measurements
     height = height / len(measurelist)
     shoulder = shoulder / len(measurelist)

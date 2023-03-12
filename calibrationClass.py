@@ -82,10 +82,25 @@ class calibration:
         # detected corners (twodpoints)
         self.ret, self.matrix, self.distortion, self.r_vecs, self.t_vecs = cv2.calibrateCamera(
             self.threedpoints, self.twodpoints, grayColor.shape[::-1], None, None)
+        print("matrix aquired")
+        self.getNewCameraMatrix(images[0])
+        
+    def getNewCameraMatrix(self, image):
+        h, w = image.shape[:2]
+        self.newcameramatrix, self.roi = cv2.getOptimalNewCameraMatrix(self.matrix, self.distortion, (w,h), 1, (w,h))
+        print("new camera matrix aqured")
+        return
+        
+            
     
     def undistortImage(self, image):
         img = image
-        h, w = img.shape[:2]
-        self.newcameramatrix, self.roi = cv2.getOptimalNewCameraMatrix(self.matrix, self.distortion, (w,h), 1, (w,h))
-        self.outputImage = cv2.undistort(img, self.matrix, self.distortion, None, self.newcameramatrix)
-        return self.outputImage
+        #h, w = img.shape[:2]
+        #self.newcameramatrix, self.roi = cv2.getOptimalNewCameraMatrix(self.matrix, self.distortion, (w,h), 1, (w,h))
+        outputImage = cv2.undistort(img, self.matrix, self.distortion, None, self.newcameramatrix)
+        #mapx, mapy = cv2.initUndistortRectifyMap(self.matrix, self.distortion, None, self.newcameramatrix, (w,h), 5)
+        #self.outputImage = cv2.remap(img, mapx, mapy, cv2.INTER_LINEAR)
+        x, y, w, h = self.roi
+        outputImage = outputImage[y:y+h, x:x+w]
+        print("image undistorted")
+        return outputImage

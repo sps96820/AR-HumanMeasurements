@@ -9,12 +9,12 @@ class scaleAq:
         self.arucoDict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_7X7_250)
         self.arucoParam = cv2.aruco.DetectorParameters()
 
-        self.cap = cv2.VideoCapture(0)
+        #self.cap = cv2.VideoCapture(0)
         #cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc('m','j','p','g'))
         #cap.set(cv2.CAP_PROP_FPS, 120)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        self.ratio = 0
+        #self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        #self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        #self.ratio = 0
         self.arucoPresent = False
 
         # class variables for ratio array and average Ratio
@@ -41,11 +41,11 @@ class scaleAq:
             self.arucoPresent = True
                 
             cv2.polylines(image, int_corners, True, (0, 255, 0), 2)
-        cv2.imshow("image", image)
-        key = cv2.waitKey(1)
-        if key == 27:
-            self.cap.release()
-            cv2.destroyAllWindows()
+        #cv2.imshow("image", image)
+        #key = cv2.waitKey(1)
+        #if key == 27:
+            #self.cap.release()
+            #cv2.destroyAllWindows()
         return self.arucoPresent
             #break
         #sum = 0

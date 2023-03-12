@@ -1,3 +1,4 @@
+import cv2
 from math import sqrt
 from pip import main
 import time
@@ -10,7 +11,7 @@ close = 0
 
 # Function for mediapipe code
 def media(image):
-    measurements = []
+    measurements = [[],[],[]]
     # For static images:
     BG_COLOR = (192, 192, 192) # gray
     with mp_pose.Pose(
@@ -55,7 +56,10 @@ def media(image):
             armsx = abs(rshoulder.x*image_width - rwrist.x*image_width)
             armsy = abs(rshoulder.y*image_height - rwrist.y*image_height)
             arms = sqrt(armsx*armsx + armsy*armsy)
-            measurements.append(height, shoulder, arms)
+            #measurements.append(height, shoulder, arms)
+            measurements[0].append(height)
+            measurements[1].append(shoulder)
+            measurements[2].append(arms)
             return measurements
 
 
