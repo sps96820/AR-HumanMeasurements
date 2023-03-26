@@ -80,10 +80,16 @@ class calibration:
         # passing the value of above found out 3D points (threedpoints)
         # and its corresponding pixel coordinates of the
         # detected corners (twodpoints)
-        self.ret, self.matrix, self.distortion, self.r_vecs, self.t_vecs = cv2.calibrateCamera(
-            self.threedpoints, self.twodpoints, grayColor.shape[::-1], None, None)
-        print("matrix aquired")
-        self.getNewCameraMatrix(images[0])
+        print(len(self.threedpoints), flush=True)
+        if len(self.threedpoints) > 0:
+            self.ret, self.matrix, self.distortion, self.r_vecs, self.t_vecs = cv2.calibrateCamera(
+                self.threedpoints, self.twodpoints, grayColor.shape[::-1], None, None)
+            print("matrix aquired", flush=True)
+            self.getNewCameraMatrix(images[0])
+            return True
+        else:
+            print("checkerboard not found", flush=True)
+            return False
         
     def getNewCameraMatrix(self, image):
         h, w = image.shape[:2]
