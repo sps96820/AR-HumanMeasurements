@@ -54,18 +54,20 @@ def media():
                     landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
                 # Flip the image horizontally for a selfie-view display.
                 cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
-                reyebrow = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE]
-                rheel = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HEEL]
+                #reyebrow = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_EYE]
+                #rheel = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HEEL]
                 # lshoulder = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
                 # rshoulder = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
                 # rwrist = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
                 # rhip = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_HIP]
                 # lhip = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_HIP]
                 # rankle = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ANKLE]
+                '''
                 if close == 1:
                     height = reyebrow.y - rheel.y 
                     print(height)
                     break
+                '''
                 if cv2.waitKey(5) & 0xFF == 27:
                     break
             cap.release()
