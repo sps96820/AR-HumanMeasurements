@@ -10,21 +10,26 @@ from calibrationClass import calibration as cal
 from arucoClass import scaleAq as aru
 import numpy as np
 import mediapipe as mp
+from queue import Queue
 
 
 # Define a function to update the webcam output
-def update_frame():
+def update_frame(q):
     global label
-    mp_pose = mp.solutions.pose
-    mp_drawing = mp.solutions.drawing_utils
-    mp_drawing_styles = mp.solutions.drawing_styles
-    _, frame = cap.read()
-    #if len(imagearr) != 30:
-        #imagearr.append(frame)
-    with mp_pose.Pose(
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5) as pose:
-            
+    calibBool = False
+    while True:
+        _, frame = cap.read()
+        #if len(imagearr) != 30:
+            #imagearr.append(frame)
+        
+        #with mp_pose.Pose(
+        #       min_detection_confidence=0.5,
+        #      min_tracking_confidence=0.5) as pose:
+        if not q.empty():
+            print("queue triggered")
+            calibBool = q.get()
+            print(calibBool)
+
         results = pose.process(frame)
         mp_drawing.draw_landmarks(
                     frame,
@@ -37,11 +42,12 @@ def update_frame():
             sca.scale(frame)
             int_corners = np.int0(sca.bboxs)
             cv2.polylines(frame, int_corners, True, (0, 255, 0), 2)
-
-        calibFrameUpdate.singleImage(frame)
-        if calibFrameUpdate.threedpoints:
-            frame = cv2.drawChessboardCorners(frame, calibFrameUpdate.CHECKERBOARD, calibFrameUpdate.corners2, calibFrameUpdate.ret)
-        
+        if calibBool:
+        #print("calib")
+            calibFrameUpdate.singleImage(frame)
+            if calibFrameUpdate.threedpoints:
+                frame = cv2.drawChessboardCorners(frame, calibFrameUpdate.CHECKERBOARD, calibFrameUpdate.corners2, calibFrameUpdate.ret)
+            
         cv2.imshow("image", cv2.flip(frame,1))
         key = cv2.waitKey(1)
         if key == 27:
@@ -49,31 +55,46 @@ def update_frame():
             return
         if not im.is_alive:
             cv2.destroyAllWindows()
-            return
-        #update_frame(imagearr)
+        
+            #update_frame(imagearr)
 
 # Function for main
 def main():
     time.sleep(4)
     global cap
     global sca
+    global pose
+
+    global mp_pose
+    global mp_drawing
+    global mp_drawing_styles
+    mp_pose = mp.solutions.pose
+    mp_drawing = mp.solutions.drawing_utils
+    mp_drawing_styles = mp.solutions.drawing_styles
+    pose = mp_pose.Pose(model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5)
+
     sca = aru()
     global calib
     calib = cal()
+
+    global calibBool
+    calibBool = False
     
     global calibFrameUpdate
+    q = Queue()
+    q.put(False)
     calibFrameUpdate = cal()
-    
     sys.setrecursionlimit(9999)
     imagearr = []
     cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     global im 
-    im = threading.Thread(target = imaging, args=())
+    im = threading.Thread(target = imaging, args=(q,))
     im.start()
-    while True:
-        update_frame()
+    update_frame(q)
 
-def imaging():
+def imaging(q):
     time.sleep(2)
     # Undistort images
     #calib = cal()
@@ -81,17 +102,19 @@ def imaging():
     for i in range(30):
         _, tempCap = cap.read() 
         imagearr.append(tempCap)
+    q.put(True)
     temp = calib.getMatrix(imagearr)
     while temp == False:
         print("Checkerboard not found. Hold it up", flush=True)
         for i in range(30):
             _, tempImage = cap.read() 
             imagearr[i] = tempImage
-        time.sleep(2)
-        temp = calib.getMatrix(imagearr)
+            time.sleep(2)
+            temp = calib.getMatrix(imagearr)
+            q.put(True)
         
     
-    
+    q.put(False)
     print("Put checkerboard down and hold aruco marker", flush=True)
     time.sleep(2)
     corrected = []
