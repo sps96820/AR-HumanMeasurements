@@ -14,11 +14,13 @@ from queue import Queue
 
 
 # Define a function to update the webcam output
-def update_frame(q):
+def update_frame(q, heightq, armq, shoulderq, instructionq):
     global label
     calibBool = False
     while True:
         _, frame = cap.read()
+        image_height, image_width, _ = frame.shape
+
         #if len(imagearr) != 30:
             #imagearr.append(frame)
         
@@ -26,7 +28,7 @@ def update_frame(q):
         #       min_detection_confidence=0.5,
         #      min_tracking_confidence=0.5) as pose:
         if not q.empty():
-            print("queue triggered")
+            #print("queue triggered")
             calibBool = q.get()
             print(calibBool)
 
@@ -36,6 +38,53 @@ def update_frame(q):
                     results.pose_landmarks,
                     mp_pose.POSE_CONNECTIONS,
                     landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+        
+        if results.pose_landmarks != None:
+            rshoulder = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+            lshoulder = results.pose_landmarks.landmark[mp_pose.PoseLandmark.LEFT_SHOULDER]
+            rwrist = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_WRIST]
+            relbow = results.pose_landmarks.landmark[mp_pose.PoseLandmark.RIGHT_ELBOW]
+            relbowx = relbow.x * image_width
+            relbowy = relbow.y * image_height
+            nose = results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE]
+            nosex = nose.x * image_width
+            nosey = nose.y * image_height
+            rshoulderx = rshoulder.x * image_width
+            rshouldery = rshoulder.y * image_height
+            chestx = ((rshoulder.x * image_width) + (lshoulder.x * image_width)) / 2
+            chesty = ((rshoulder.y * image_height) + (lshoulder.y * image_height)) / 2
+            
+            if not instructionq.empty():
+                instruction = instructionq.get()
+            if not heightq.empty():
+                height = heightq.get()
+            if not armq.empty():
+                arml = armq.get()
+            if not shoulderq.empty():
+                shoulderl = shoulderq.get()
+            
+            if instruction == "Paper Up":
+                cv2.putText(frame, "Hold Aruco Marker up against chest", (int(image_width*.02), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1, (50, 205, 50), 3)
+            elif instruction == "Papers Down":
+                cv2.putText(frame, "Put papers down", (int(image_width*.05), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+            elif instruction == "be still":
+                cv2.putText(frame, "Stand still and hold arms to side", (int(image_width*.02), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+            elif instruction == "start":
+                cv2.putText(frame, "Ensure full body is in frame", (int(image_width*.05), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+            elif instruction == "wait":
+                cv2.putText(frame, "Calculating...", (int(image_width*.05), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+            elif instruction == "end":
+                 cv2.putText(frame, "Measurements are shown above!", (int(image_width*.05), int(image_height*.85)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+               
+            
+            if arml != 0:
+                cv2.putText(frame, "Arm Length: {}".format(round(arml,1)), (int(relbowx), int(relbowy)), cv2.FONT_HERSHEY_COMPLEX, 1.05, (50, 205, 50), 3)
+            if height != 0:
+                cv2.putText(frame, "Height: {}".format(round(height, 1)), (int(nosex), int(nosey) - 40), cv2.FONT_HERSHEY_COMPLEX, 1.1, (50, 205, 50), 3)
+            if shoulderl != 0:
+                cv2.putText(frame, "Shoulder Width: {}".format(round(shoulderl, 1)), (int(rshoulderx), int(rshouldery)), cv2.FONT_HERSHEY_COMPLEX, 1, (50, 205, 50), 3)
+            
+            #cv2.circle(frame, (int(relbowx), int(relbowy)), 10, (0, 0, 255), -1)
 
         sca.scale(frame)
         if sca.bboxs:
@@ -48,7 +97,7 @@ def update_frame(q):
             #if calibFrameUpdate.threedpoints:
                 #frame = cv2.drawChessboardCorners(frame, calibFrameUpdate.CHECKERBOARD, calibFrameUpdate.corners2, calibFrameUpdate.ret)
             
-        cv2.imshow("image", cv2.flip(frame,1))
+        cv2.imshow("image", frame)
         key = cv2.waitKey(1)
         if key == 27:
             cv2.destroyAllWindows()
@@ -64,7 +113,6 @@ def main():
     global cap
     global sca
     global pose
-
     global mp_pose
     global mp_drawing
     global mp_drawing_styles
@@ -81,6 +129,18 @@ def main():
     calibBool = False
     
     global calibFrameUpdate
+    heightq = Queue()
+    heightq.put(0)
+    
+    armq = Queue()
+    armq.put(0)
+    
+    shoulderq = Queue()
+    shoulderq.put(0)
+    
+    instructionq = Queue()
+    instructionq.put("None")
+    
     q = Queue()
     q.put(False)
     calibFrameUpdate = cal()
@@ -90,32 +150,34 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     global im 
-    im = threading.Thread(target = imaging, args=(q,))
+    im = threading.Thread(target = imaging, args=(q, heightq, armq, shoulderq, instructionq))
     im.start()
-    update_frame(q)
+    update_frame(q, heightq, armq, shoulderq, instructionq)
 
-def imaging(q):
-    time.sleep(2)
+def imaging(q, heightq, armq, shoulderq, instructionq):
+    instructionq.put("start")
+    time.sleep(10)
     # Undistort images
     #calib = cal()
     imagearr = []
     for i in range(30):
         _, tempCap = cap.read() 
         imagearr.append(tempCap)
-    q.put(True)
-    temp = calib.getMatrix(imagearr)
-    while temp == False:
-        print("Checkerboard not found. Hold it up", flush=True)
-        for i in range(30):
-            _, tempImage = cap.read() 
-            imagearr[i] = tempImage
-            time.sleep(2)
-            temp = calib.getMatrix(imagearr)
-            q.put(True)
+    #q.put(True)
+    #temp = calib.getMatrix(imagearr)
+    #while temp == False:
+        #print("Checkerboard not found. Hold it up", flush=True)
+        #for i in range(30):
+            #_, tempImage = cap.read() 
+            #imagearr[i] = tempImage
+            #time.sleep(2)
+           # temp = calib.getMatrix(imagearr)
+          #  q.put(True)
         
     
     q.put(False)
     print("Put checkerboard down and hold aruco marker", flush=True)
+    instructionq.put("Paper Up")
     time.sleep(2)
     corrected = []
     for i in range(30):
@@ -149,13 +211,16 @@ def imaging(q):
     mediapipeImgs = []
     
     print("Put papers down", flush=True)
+    instructionq.put("Papers Down")
     time.sleep(3)
+    instructionq.put("be still")
+    time.sleep(2)
     for i in range(30):
         _, tempCap = cap.read() 
         mediapipeImgs.append(tempCap)
         #mediapipeImgs.append(calib.undistortImage(tempCap))
         #mediapipeImgs[i] = calib.undistortImage(mediapipeImgs[i])
-    
+    instructionq.put("wait")
     measurelist = [[] for i in range(3)]
     #for image in corrected:
     for image in mediapipeImgs:
@@ -167,6 +232,11 @@ def imaging(q):
     avglist = measureavg(measurelist, ratio)
     # Print final values
     print("Height: ", avglist[0], "\nShoulder: ", avglist[1], "\nArms: ", avglist[2], flush=True)
+    instructionq.put("end")
+    heightq.put(avglist[0])
+    shoulderq.put(avglist[1])
+    armq.put(avglist[2])
+
     
     
     

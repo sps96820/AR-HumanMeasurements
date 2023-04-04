@@ -18,11 +18,11 @@ while i < 30:
     #print(temp.ratio)
     i+=1
 
-calib.getMatrix(images)
+#calib.getMatrix(images)
 
 while True:
     _, image = cap.read()
-    image = calib.undistortImage(image)
+    #image = calib.undistortImage(image)
     temp.scale(image)
     cv2.imshow("image", image)
     print(temp.ratio)
