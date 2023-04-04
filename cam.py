@@ -42,11 +42,11 @@ def update_frame(q):
             sca.scale(frame)
             int_corners = np.int0(sca.bboxs)
             cv2.polylines(frame, int_corners, True, (0, 255, 0), 2)
-        if calibBool:
+        #if calibBool:
         #print("calib")
-            calibFrameUpdate.singleImage(frame)
-            if calibFrameUpdate.threedpoints:
-                frame = cv2.drawChessboardCorners(frame, calibFrameUpdate.CHECKERBOARD, calibFrameUpdate.corners2, calibFrameUpdate.ret)
+            #calibFrameUpdate.singleImage(frame)
+            #if calibFrameUpdate.threedpoints:
+                #frame = cv2.drawChessboardCorners(frame, calibFrameUpdate.CHECKERBOARD, calibFrameUpdate.corners2, calibFrameUpdate.ret)
             
         cv2.imshow("image", cv2.flip(frame,1))
         key = cv2.waitKey(1)
