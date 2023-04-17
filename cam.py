@@ -147,8 +147,8 @@ def main():
     sys.setrecursionlimit(9999)
     imagearr = []
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1024)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 768)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     global im 
     im = threading.Thread(target = imaging, args=(q, heightq, armq, shoulderq, instructionq))
     im.start()
